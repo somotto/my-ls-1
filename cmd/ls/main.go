@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	L "my-ls-1/internal/list"
 	FI "my-ls-1/pkg/fileinfo"
@@ -23,13 +24,16 @@ func main() {
 	}
 	args, _ = AddFullPathAndSort(args)
 	for i, arg := range args {
+
 		if len(args) > 1 {
 			if i > 0 {
 				fmt.Println()
 			}
 			filIf, _ := os.Stat(arg)
 			if FI.CreateFileInfo(arg, filIf); filIf.IsDir() {
-				fmt.Printf("%s:\n", arg)
+				if !containsMultipleSlash(args) {
+					fmt.Printf("%s:\n", arg)
+				}
 			}
 		}
 
@@ -51,9 +55,11 @@ func main() {
 	}
 }
 
-/*This function will take an array of entries, and will sort the array
+/*
+This function will take an array of entries, and will sort the array
 by seperating the directories from the files and prepend the files and
-returns a sorted array*/
+returns a sorted array
+*/
 func AddFullPathAndSort(shortPaths []string) ([]string, error) {
 
 	// Separate files and directories
@@ -72,4 +78,13 @@ func AddFullPathAndSort(shortPaths []string) ([]string, error) {
 
 	// Combine files and directories
 	return append(files, dirs...), nil
+}
+
+func containsMultipleSlash(a []string) bool {
+	for _, b := range a {
+		if strings.Contains(b, "///") {
+			return true
+		}
+	}
+	return false
 }

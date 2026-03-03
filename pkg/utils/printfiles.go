@@ -14,7 +14,7 @@ import (
 
 var Path string
 
-//This function will print entries in the long format. (ls -l)
+// This function will print entries in the long format. (ls -l)
 func PrintLongFormat(files []FI.FileInfo, options OP.Options) {
 
 	if len(os.Args) > 2 {
@@ -46,6 +46,7 @@ func PrintLongFormat(files []FI.FileInfo, options OP.Options) {
 
 						totalBlocks, _ := calculateTotalBlocks(path, options)
 						fmt.Printf("total %d\n", totalBlocks)
+						break
 					}
 				}
 			}
@@ -111,6 +112,7 @@ func PrintLongFormat(files []FI.FileInfo, options OP.Options) {
 	}
 	if val, _ := IsSymlink(Path); val {
 		files, _ = GetSymlinksInDir(fmt.Sprintf("%s/..", Path))
+		files = filterSymLink(files)
 	}
 
 	for _, file := range files {
@@ -148,6 +150,16 @@ func PrintLongFormat(files []FI.FileInfo, options OP.Options) {
 	}
 }
 
+func filterSymLink(files []FI.FileInfo) []FI.FileInfo {
+	link := os.Args[len(os.Args)-1]
+	for _, fi := range files {
+		if fi.Name == link {
+			return []FI.FileInfo{fi}
+		}
+	}
+	return files
+}
+
 //This function will format the files in the terminal correctly, based on the column width
 func PrintColumnar(files []FI.FileInfo, options OP.Options) {
 	termWidth := T.GetTerminalWidth()
@@ -183,7 +195,7 @@ func PrintColumnar(files []FI.FileInfo, options OP.Options) {
 	}
 }
 
-//This functions lists entries to the console based on the option long format
+// This functions lists entries to the console based on the option long format
 func PrintFiles(files []FI.FileInfo, options OP.Options) {
 	if options.LongFormat {
 		PrintLongFormat(files, options)
@@ -196,8 +208,10 @@ func PrintFiles(files []FI.FileInfo, options OP.Options) {
 	}
 }
 
-/*Extract major and minor device numbers from a uintptr,
-which typically represents the underlying system's device information.*/
+/*
+Extract major and minor device numbers from a uintptr,
+which typically represents the underlying system's device information.
+*/
 func Major(dev uint64) uint64 {
 	return (dev >> 8) & 0xFF
 }

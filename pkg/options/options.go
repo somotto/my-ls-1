@@ -17,10 +17,12 @@ type Options struct {
 	NoColor    bool
 }
 
-/*The function will collect the command line arguments and sort them into flags
+/*
+The function will collect the command line arguments and sort them into flags
 and files. Declares each flag as well. If the option is -- the functioin will
 treat it as current directory. The function returns options boolean values
-as well as the array containing the files/directories to be displayed by the ls command.*/
+as well as the array containing the files/directories to be displayed by the ls command.
+*/
 func ParseFlags() (Options, []string) {
 	var options Options
 
@@ -58,9 +60,25 @@ func ParseFlags() (Options, []string) {
 			dirs = append(dirs, args[i+1:]...)
 			break
 		} else {
+			if strings.HasSuffix(arg, "/") {
+				IsNormalFile(arg)
+			}
 			dirs = append(dirs, arg)
 		}
 	}
 
 	return options, dirs
+}
+
+func LinkMessage(path string) {
+	fmt.Printf("ls: cannot access '%s': Not a directory\n", path)
+}
+
+func IsNormalFile(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		LinkMessage(path)
+		os.Exit(0)
+	}
+	return !fileInfo.IsDir()
 }
