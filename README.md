@@ -68,6 +68,7 @@ The main objective of this project is to create a command that lists files and d
 ## Features
 
 - Mimics the behavior of the original `ls` command.
+
 - Supports the following flags:
   - `-l`: Long format listing
   - `-R`: Recursively list subdirectories
